@@ -1,0 +1,74 @@
+service: serverless-testRun-rest-api
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: eu-west-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetStudent
+        - dynamodb:PutStudent
+        - dynamodb:UpdateStudent
+        - dynamodb:DeleteStudent
+      Resource: arn:aws:dynamodb:eu-west-1:*:*
+
+resources:
+  Resources:
+    StudentstTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - 
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - 
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: 'studentst'
+
+functions:
+  create:
+    handler: src/handler/createStudent.createStudent
+    events:
+      - http:
+          path: studentst
+          method: post
+          cors: true
+  get:
+    handler: src/handler/getStudent.getStudent
+    events:
+      - http:
+          path: studentst/{id}
+          method: get
+          cors: true        
+  list:
+    handler: src/handler/listStudent.listStudent
+    events:
+      - http:
+          path: studentst
+          method: get
+          cors: true
+  update:
+    handler: src/handler/updateStudent.updateStudent
+    events:
+      - http:
+          path: studentst/{id}
+          method: put
+          cors: true 
+  delete:
+    handler: src/handler/deleteStudent.deleteStudent
+    events:
+      - http:
+          path: studentst/{id}
+          method: delete
+          cors: true              
